@@ -45,4 +45,10 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
 
+    <ListView
+        android:id="@+id/listview1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/button" />
+
 </RelativeLayout>
