@@ -17,6 +17,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -45,6 +46,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public ArrayAdapter adapter;
     public ListView listview;
 
+    TextView curpos;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,21 +68,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         listview.setOnItemClickListener(this);
 
+        curpos = (TextView)findViewById(R.id.cur_pos);
+
+        curpos.setText(currentPage + " / 30");
+
         // 공지 다음으로 넘어가는 버튼
         Button nextButton = (Button)findViewById(R.id.button4);
 
         // 공지 이전으로 넘어가는 버튼
         Button preButton = (Button)findViewById(R.id.button5);
-
-        // 행사 공지 크롤링 버튼 생성
-        final Button htmlTitleButton = (Button)findViewById(R.id.button);
-
-        // 학사 공지 크롤링 버튼 생성
-        Button hacksaNoticeButton = (Button)findViewById(R.id.button2);
-
-        // 장학 공지 크롤링 버튼 생성
-        Button janghackNoticeButton = (Button)findViewById(R.id.button3);
-
 
         // 다음으로 넘어가는 버튼 리스너
         nextButton.setOnClickListener(new View.OnClickListener() {
@@ -99,6 +96,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                     JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask();
                     jsoupAsyncTask.execute();
+                    curpos.setText(currentPage + " / 30");
                 }
             }
         });
@@ -120,65 +118,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                     JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask();
                     jsoupAsyncTask.execute();
+                    curpos.setText(currentPage + " / 30");
                 }
             }
         });
-
-        // 행사공지 크롤링 버튼 리스너
-        htmlTitleButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // 띄워져 있는 공지 clear & 공지 1페이지로 초기화
-                items.clear();
-                currentPage = 1;
-                // 행사공지 URL 연결
-                htmlPageUrl = "http://www.skhu.ac.kr/board/boardlist.aspx?curpage=1&bsid=10008";
-                // 행사공지 카운트 초기화
-                ContestNoticeCount = 0;
-                System.out.println( (cnt+1) +"번째 파싱");
-                JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask();
-                jsoupAsyncTask.execute();
-                cnt++;
-            }
-        });
-
-        // 학사공지 크롤링 버튼 리스너
-        hacksaNoticeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // 띄워져 있는 공지 clear & 공지 1페이지로 초기화
-                items.clear();
-                currentPage = 1;
-                // 학사공지 URL 연결
-                htmlPageUrl = "http://www.skhu.ac.kr/board/boardlist.aspx?curpage=1&bsid=10004&searchBun=51";
-                // 학사공지 카운트 초기화
-                HacksaNoticeCount = 0;
-                System.out.println( (cnt+1) +"번째 파싱");
-                JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask();
-                jsoupAsyncTask.execute();
-                cnt++;
-            }
-        });
-
-        // 장학공지 크롤링 버튼 리스너
-        janghackNoticeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // 띄워져 있는 공지 clear & 공지 1페이지로 초기화
-                items.clear();
-                currentPage = 1;
-                // 장학공지 URL 연결
-                htmlPageUrl = "http://www.skhu.ac.kr/board/boardlist.aspx?curpage=1&bsid=10006&searchBun=75";
-                // 장학공지 카운트 초기화
-                JanghakcNoticeCount = 0;
-                System.out.println( (cnt+1) +"번째 파싱");
-                JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask();
-                jsoupAsyncTask.execute();
-                cnt++;
-            }
-        });
-
-
 
         // 맨 처음 실행되는 크롤링
         JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask();
@@ -194,7 +137,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private class JsoupAsyncTask extends AsyncTask<Void, Void, Void> {
 
-
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -209,7 +151,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 //테스트1
                 Elements titles= doc.select("td.left15");
 
-                System.out.println("-------------------------------------------------------------");
                 for(Element e: titles){
                     htmlContentInStringFormat += e.text().trim() + "\n";
 
@@ -241,16 +182,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     urlPath[i] = href;
                     i++;
                 }
-//
-//                //테스트3
-//                titles= doc.select("li.section02 div.con h2.news-tl");
-//
-//                System.out.println("-------------------------------------------------------------");
-//                for(Element e: titles){
-//                    System.out.println("title: " + e.text());
-//                    htmlContentInStringFormat += e.text().trim() + "\n";
-//                }
-//                System.out.println("-------------------------------------------------------------");
 
             } catch (IOException e) {
                 e.printStackTrace();
