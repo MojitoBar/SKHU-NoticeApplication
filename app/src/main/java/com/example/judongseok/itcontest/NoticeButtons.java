@@ -21,6 +21,16 @@ public class NoticeButtons extends AppCompatActivity{
         Button btn_hacksa= (Button)findViewById(R.id.hacksa);
         Button btn_suep= (Button)findViewById(R.id.suep);
 
+        Button btn_option = (Button)findViewById(R.id.button);
+
+        btn_option.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(NoticeButtons.this, MainScene.class);
+                startActivity(intent);
+            }
+        });
+
         btn_hacksa.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
