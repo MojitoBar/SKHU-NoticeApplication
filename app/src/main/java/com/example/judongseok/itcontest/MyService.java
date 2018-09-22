@@ -3,6 +3,7 @@ package com.example.judongseok.itcontest;
 import android.app.Activity;
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.IBinder;
 
 import android.app.Notification;
@@ -29,19 +30,21 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
-
+import java.net.URL;
 
 
 public class MyService extends Service {
     private String htmlPageUrl = "http://www.skhu.ac.kr/board/boardlist.aspx?bsid=10008"; //파싱할 홈페이지의 URL주소
-    private TextView textviewHtmlDocument;
-    private String htmlContentInStringFormat="";
 
 
     NotificationManager Notifi_M;
     ServiceThread thread;
     Notification Notifi ;
-    MainActivity mainActivity;
+
+    String[] urlPath = new String[30];
+    String LastJUrl = "";
+    String LastHUrl = "";
+    String LastCUrl = "";
 
     // 크롤링 카운터
     int cnt = 0;
@@ -62,8 +65,13 @@ public class MyService extends Service {
                 Elements titles= doc.select("td.left15");
 
                 for(Element e: titles){
-                    htmlContentInStringFormat += e.text().trim() + "\n";
                     cnt++;
+                }
+                int i = 0;
+                for(Element e: titles){
+                    String href = e.attr("abs:href");
+                    urlPath[i] = href;
+                    i++;
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -85,7 +93,6 @@ public class MyService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        mainActivity = new MainActivity();
         Notifi_M = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         myServiceHandler handler = new myServiceHandler();
         thread = new ServiceThread(handler);
@@ -102,14 +109,17 @@ public class MyService extends Service {
 
     void crawlingCheck(){
 
+        SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
+        LastJUrl = pref.getString("LastJUrl", "");
+        LastCUrl = pref.getString("LastCUrl", "");
+        LastHUrl = pref.getString("LastHUrl", "");
+
         JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask();
         jsoupAsyncTask.execute();
-            System.out.println(mainActivity.ContestNoticeCount);
-            System.out.println(cnt);
 
-        if(mainActivity.ContestNoticeCount != cnt){
 
-        }
+
+        cnt = 0;
     }
 
     class myServiceHandler extends Handler {

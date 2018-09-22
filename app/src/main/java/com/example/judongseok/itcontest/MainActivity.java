@@ -28,15 +28,10 @@ import android.os.Bundle;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
 
-    // 크롤링 공지에 변화가 생김을 체크하기 위해 SharedPreferences 사용
-    SharedPreferences pref= getSharedPreferences("pref", MODE_PRIVATE); // 선언
-
-
-    SharedPreferences.Editor editor = pref.edit();// editor에 put 하기
-
-
     private String htmlPageUrl = null;  //파싱할 홈페이지의 URL주소
-    private String htmlContentInStringFormat="";
+    private String[] CurlPath;
+    private String[] HurlPath;
+    private String[] JurlPath;
     private String[] urlPath;
 
     // 행사공지 카운터
@@ -62,6 +57,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         Intent intent = getIntent();
         htmlPageUrl = intent.getStringExtra("HtmlUrl");
+
+        CurlPath = new String[30];
+        HurlPath = new String[30];
+        JurlPath = new String[30];
 
         urlPath = new String[30];
 
@@ -159,22 +158,21 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 Elements titles= doc.select("td.left15");
 
                 for(Element e: titles){
-                    htmlContentInStringFormat += e.text().trim() + "\n";
 
                     // 아이템 추가.
                     items.add(e.text().trim());
 
 
                     // 크롤링 페이지가 행사 공지일 때
-                    if(htmlPageUrl == "http://www.skhu.ac.kr/board/boardlist.aspx?bsid=10008")
+                    if(htmlPageUrl.equals("http://www.skhu.ac.kr/board/boardlist.aspx?curpage=1&bsid=10008"))
                         // 행사 공지 카운터 증가
                         ContestNoticeCount++;
                     // 크롤링 페이지가 학사 공지일 때
-                    else if(htmlPageUrl == "http://www.skhu.ac.kr/board/boardlist.aspx?curpage=1&bsid=10004&searchBun=51")
+                    else if(htmlPageUrl.equals("http://www.skhu.ac.kr/board/boardlist.aspx?curpage=1&bsid=10004&searchBun=51"))
                         // 학사 공지 카운터 증가
                         HacksaNoticeCount++;
                     // 크롤링 페이지가 장학 공지일 때
-                    else if(htmlPageUrl == "http://www.skhu.ac.kr/board/boardlist.aspx?curpage=1&bsid=10006&searchBun=75")
+                    else if(htmlPageUrl.equals("http://www.skhu.ac.kr/board/boardlist.aspx?curpage=1&bsid=10006&searchBun=75"))
                         // 장학 공지 카운터 증가
                         JanghakcNoticeCount++;
                 }
@@ -185,9 +183,33 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 int i = 0;
                 System.out.println("-------------------------------------------------------------");
                 for(Element e: titles){
-                    String href = e.attr("abs:href");
-                    urlPath[i] = href;
-                    i++;
+
+                    // 크롤링 페이지가 행사 공지일 때
+                    if(htmlPageUrl.equals("http://www.skhu.ac.kr/board/boardlist.aspx?curpage=1&bsid=10008")){
+                        String href = e.attr("abs:href");
+                        CurlPath[i] = href;
+                        urlPath[i] = href;
+                        System.out.println(CurlPath[i]);
+
+                        i++;
+
+                    }
+
+                        // 크롤링 페이지가 학사 공지일 때
+                    else if(htmlPageUrl.equals("http://www.skhu.ac.kr/board/boardlist.aspx?curpage=1&bsid=10004&searchBun=51")){
+                        String href = e.attr("abs:href");
+                        HurlPath[i] = href;
+                        urlPath[i] = href;
+                        i++;
+                    }
+                        // 크롤링 페이지가 장학 공지일 때
+                    else if(htmlPageUrl.equals("http://www.skhu.ac.kr/board/boardlist.aspx?curpage=1&bsid=10006&searchBun=75")){
+                        String href = e.attr("abs:href");
+                        JurlPath[i] = href;
+                        urlPath[i] = href;
+                        i++;
+                    }
+
                 }
 
             } catch (IOException e) {
@@ -200,7 +222,28 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         protected void onPostExecute(Void result) {
             // listview 갱신
             adapter.notifyDataSetChanged();
+
+            setPreferences();
+            SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
+            SharedPreferences.Editor editor = pref.edit();
+            System.out.println(pref.getString("LastJUrl", null));
+            System.out.println(pref.getString("LastHUrl", null));
+            System.out.println(pref.getString("LastCUrl", null));
             //textviewHtmlDocument.setText(htmlContentInStringFormat);
         }
+    }
+
+    void setPreferences(){
+
+        SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
+        SharedPreferences.Editor editor = pref.edit();
+        if(JurlPath[23] != null)
+            editor.putString("LastJUrl", JurlPath[23]);
+        if(CurlPath[14] != null)
+            editor.putString("LastCUrl", CurlPath[14]);
+        if(HurlPath[20] != null)
+            editor.putString("LastHUrl", HurlPath[20]);
+
+        editor.commit();
     }
 }
