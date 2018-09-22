@@ -1,6 +1,7 @@
 package com.example.judongseok.itcontest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -26,18 +27,24 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
+
+    // 크롤링 공지에 변화가 생김을 체크하기 위해 SharedPreferences 사용
+    SharedPreferences pref= getSharedPreferences("pref", MODE_PRIVATE); // 선언
+
+
+    SharedPreferences.Editor editor = pref.edit();// editor에 put 하기
+
+
     private String htmlPageUrl = null;  //파싱할 홈페이지의 URL주소
     private String htmlContentInStringFormat="";
     private String[] urlPath;
 
-    // 크롤링 카운터
-    int cnt=0;
     // 행사공지 카운터
-    int ContestNoticeCount = 0;
+    public int ContestNoticeCount = 0;
     // 학사공지 카운터
-    int HacksaNoticeCount= 0;
+    public int HacksaNoticeCount= 0;
     // 장학공지 카운터
-    int JanghakcNoticeCount= 0;
+    public int JanghakcNoticeCount= 0;
 
     int currentPage = 1;
 
@@ -60,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         items = new ArrayList<String>() ;
         // ArrayAdapter 생성. 아이템 View를 선택(single choice)가능하도록 만듦.
-        adapter = new ArrayAdapter(this, R.layout.mytextview, items) ;
+        adapter = new ArrayAdapter(this, R.layout.mytextview, items);
 
         // listview 생성 및 adapter 지정.
         listview = (ListView) findViewById(R.id.listview1);
@@ -94,8 +101,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                     items.clear();
 
-                    JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask();
-                    jsoupAsyncTask.execute();
+                        JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask();
+                        jsoupAsyncTask.execute();
                     curpos.setText(currentPage + " / 30");
                 }
             }
