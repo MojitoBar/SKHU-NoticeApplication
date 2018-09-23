@@ -189,8 +189,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                         String href = e.attr("abs:href");
                         CurlPath[i] = href;
                         urlPath[i] = href;
-                        System.out.println(CurlPath[i]);
-
                         i++;
 
                     }
@@ -237,12 +235,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
         SharedPreferences.Editor editor = pref.edit();
-        if(JurlPath[23] != null)
-            editor.putString("LastJUrl", JurlPath[23]);
-        if(CurlPath[14] != null)
-            editor.putString("LastCUrl", CurlPath[14]);
-        if(HurlPath[20] != null)
-            editor.putString("LastHUrl", HurlPath[20]);
+
+        if (currentPage == 1) {
+            if (JurlPath[23] != null)
+                editor.putString("LastJUrl", JurlPath[23]);
+            if (CurlPath[14] != null)
+                editor.putString("LastCUrl", CurlPath[14]);
+            if (HurlPath[20] != null)
+                editor.putString("LastHUrl", HurlPath[20]);
+        }
 
         editor.commit();
     }
