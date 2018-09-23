@@ -34,20 +34,31 @@ import java.net.URL;
 
 
 public class MyService extends Service {
-    private String htmlPageUrl = "http://www.skhu.ac.kr/board/boardlist.aspx?bsid=10008"; //파싱할 홈페이지의 URL주소
+    private String htmlPageUrl = "http://www.skhu.ac.kr/board/boardlist.aspx?curpage=1&bsid=10006&searchBun=75"; //파싱할 홈페이지의 URL주소
 
 
     NotificationManager Notifi_M;
     ServiceThread thread;
     Notification Notifi ;
 
-    String[] urlPath = new String[30];
+    String[] JurlPath = new String[30];
+    String[] HurlPath = new String[30];
+    String[] CurlPath = new String[30];
     String LastJUrl = "";
     String LastHUrl = "";
     String LastCUrl = "";
 
+    String NewJUrl = "";
+    String NewHUrl = "";
+    String NewCUrl = "";
+
+    boolean j = false;
+    boolean h = false;
+    boolean c = false;
+
     // 크롤링 카운터
     int cnt = 0;
+    int num = 0;
 
     private class JsoupAsyncTask extends AsyncTask<Void, Void, Void> {
 
@@ -60,7 +71,8 @@ public class MyService extends Service {
         protected Void doInBackground(Void... params) {
             try {
 
-                Document doc = Jsoup.connect(htmlPageUrl).get();
+                // 행사공지 크롤링
+                Document doc = Jsoup.connect("http://www.skhu.ac.kr/board/boardlist.aspx?curpage=1&bsid=10008").get();
                 //테스트1
                 Elements titles= doc.select("td.left15");
 
@@ -68,9 +80,46 @@ public class MyService extends Service {
                     cnt++;
                 }
                 int i = 0;
+
+                titles= doc.select("td.left15 a");
                 for(Element e: titles){
                     String href = e.attr("abs:href");
-                    urlPath[i] = href;
+                    CurlPath[i] = href;
+                    i++;
+                }
+
+                // 학사공지 크롤링
+                doc = Jsoup.connect("http://www.skhu.ac.kr/board/boardlist.aspx?curpage=1&bsid=10004&searchBun=51").get();
+                //테스트1
+                titles= doc.select("td.left15");
+
+                for(Element e: titles){
+                    cnt++;
+                }
+                i = 0;
+
+                titles= doc.select("td.left15 a");
+                for(Element e: titles){
+                    String href = e.attr("abs:href");
+                    HurlPath[i] = href;
+                    i++;
+                }
+
+
+                // 장학공지 크롤링
+                doc = Jsoup.connect("http://www.skhu.ac.kr/board/boardlist.aspx?curpage=1&bsid=10006&searchBun=75").get();
+                //테스트1
+                titles= doc.select("td.left15");
+
+                for(Element e: titles){
+                    cnt++;
+                }
+                i = 0;
+
+                titles= doc.select("td.left15 a");
+                for(Element e: titles){
+                    String href = e.attr("abs:href");
+                    JurlPath[i] = href;
                     i++;
                 }
             } catch (IOException e) {
@@ -93,6 +142,13 @@ public class MyService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
+
+        SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
+        LastJUrl = pref.getString("LastJUrl", "");
+        LastCUrl = pref.getString("LastCUrl", "");
+        LastHUrl = pref.getString("LastHUrl", "");
+
+
         Notifi_M = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         myServiceHandler handler = new myServiceHandler();
         thread = new ServiceThread(handler);
@@ -109,14 +165,23 @@ public class MyService extends Service {
 
     void crawlingCheck(){
 
-        SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
-        LastJUrl = pref.getString("LastJUrl", "");
-        LastCUrl = pref.getString("LastCUrl", "");
-        LastHUrl = pref.getString("LastHUrl", "");
-
         JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask();
         jsoupAsyncTask.execute();
 
+        NewJUrl = JurlPath[23];
+        NewCUrl = CurlPath[14];
+        NewHUrl = HurlPath[20];
+
+
+        if (NewJUrl != null && !LastJUrl.equals(NewJUrl)){
+            j = true;
+        }
+        if (NewCUrl != null && !LastCUrl.equals(NewCUrl)){
+            c = true;
+        }
+        if (NewHUrl != null && !LastHUrl.equals(NewHUrl)){
+            h = true;
+        }
 
 
         cnt = 0;
@@ -129,28 +194,69 @@ public class MyService extends Service {
             PendingIntent pendingIntent = PendingIntent.getActivity(MyService.this, 0, intent,PendingIntent.FLAG_UPDATE_CURRENT);
 
             crawlingCheck();
-
-            Notifi = new Notification.Builder(getApplicationContext())
-                    .setContentTitle("행사 공지 알림!")
-                    .setContentText("행사 공지가 업데이트 됐습니다.")
-                    .setSmallIcon(R.drawable.icon_new_gry)
-                    .setTicker("알림!!!")
-                    .setContentIntent(pendingIntent)
-                    .build();
-            //소리추가
-            Notifi.defaults = Notification.DEFAULT_SOUND;
-
-            //알림 소리를 한번만 내도록
-            Notifi.flags = Notification.FLAG_ONLY_ALERT_ONCE;
-
-            //확인하면 자동으로 알림이 제거 되도록
-            Notifi.flags = Notification.FLAG_AUTO_CANCEL;
+//            이 부분에서 bool형 변수를 통해 Url이 다른지 체크
+//            다르다면 그에 맞는 Notifi 생성
+//            예외적으로 원하는 공지만 알림을 띄우기 위해 bool형 변수 하나 더 추가
+//            원하는 공지만 알림을 띄우기 위한 bool형 변수와 Url이 다르다는 것을 알려주는 bool형 변수 두 개가 서로 true면 Notifi 생성
 
 
-            Notifi_M.notify( 777 , Notifi);
+            if (j){
+                j = false;
+                Notifi = new Notification.Builder(getApplicationContext())
+                        .setContentTitle("장학 공지 알림!")
+                        .setContentText("장학 공지가 업데이트 됐습니다.")
+                        .setSmallIcon(R.drawable.icon_new_gry)
+                        .setTicker("알림!!!")
+                        .setContentIntent(pendingIntent)
+                        .build();
+                //소리추가
+                Notifi.defaults = Notification.DEFAULT_SOUND;
 
-            //토스트 띄우기
-//            Toast.makeText(MyService.this, "뜸?", Toast.LENGTH_LONG).show();
+                //알림 소리를 한번만 내도록
+                Notifi.flags = Notification.FLAG_ONLY_ALERT_ONCE;
+
+                //확인하면 자동으로 알림이 제거 되도록
+                Notifi.flags = Notification.FLAG_AUTO_CANCEL;
+                Notifi_M.notify( 777 , Notifi);
+            }
+            if (c){
+                c = false;
+                Notifi = new Notification.Builder(getApplicationContext())
+                        .setContentTitle("행사 공지 알림!")
+                        .setContentText("행사 공지가 업데이트 됐습니다.")
+                        .setSmallIcon(R.drawable.icon_new_gry)
+                        .setTicker("알림!!!")
+                        .setContentIntent(pendingIntent)
+                        .build();
+                //소리추가
+                Notifi.defaults = Notification.DEFAULT_SOUND;
+
+                //알림 소리를 한번만 내도록
+                Notifi.flags = Notification.FLAG_ONLY_ALERT_ONCE;
+
+                //확인하면 자동으로 알림이 제거 되도록
+                Notifi.flags = Notification.FLAG_AUTO_CANCEL;
+                Notifi_M.notify( 777 , Notifi);
+            }
+            if (h){
+                h = false;
+                Notifi = new Notification.Builder(getApplicationContext())
+                        .setContentTitle("학사 공지 알림!")
+                        .setContentText("학사 공지가 업데이트 됐습니다.")
+                        .setSmallIcon(R.drawable.icon_new_gry)
+                        .setTicker("알림!!!")
+                        .setContentIntent(pendingIntent)
+                        .build();
+                //소리추가
+                Notifi.defaults = Notification.DEFAULT_SOUND;
+
+                //알림 소리를 한번만 내도록
+                Notifi.flags = Notification.FLAG_ONLY_ALERT_ONCE;
+
+                //확인하면 자동으로 알림이 제거 되도록
+                Notifi.flags = Notification.FLAG_AUTO_CANCEL;
+                Notifi_M.notify( 777 , Notifi);
+            }
         }
     };
 }
