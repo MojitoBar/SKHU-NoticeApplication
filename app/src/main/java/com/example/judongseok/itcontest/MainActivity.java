@@ -11,7 +11,9 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.HorizontalScrollView;
 import android.widget.ListView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import org.jsoup.Jsoup;
@@ -44,9 +46,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     int currentPage = 1;
 
     // 공지들이 리스트 뷰로 보여지게 하는 변수
-    public ArrayList<String> items;
-    public ArrayAdapter adapter;
-    public ListView listview;
+    private ListView m_oListView = null;
+    ArrayList<ItemData> oData;
+    ListAdapter oAdapter;
 
     TextView curpos;
 
@@ -56,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         setContentView(R.layout.activity_main);
 
         Intent intent = getIntent();
+
         htmlPageUrl = intent.getStringExtra("HtmlUrl");
 
         CurlPath = new String[30];
@@ -64,15 +67,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         urlPath = new String[30];
 
-        items = new ArrayList<String>() ;
-        // ArrayAdapter 생성. 아이템 View를 선택(single choice)가능하도록 만듦.
-        adapter = new ArrayAdapter(this, R.layout.mytextview, items);
+        oData = new ArrayList<>();
+//        // ArrayAdapter 생성. 아이템 View를 선택(single choice)가능하도록 만듦.
+//        adapter = new ArrayAdapter(this, R.layout.mytextview, items);
+//
+//        // listview 생성 및 adapter 지정.
+//        listview = (ListView) findViewById(R.id.listview1);
+//        listview.setAdapter(adapter);
+//
+//        listview.setOnItemClickListener(this);
 
-        // listview 생성 및 adapter 지정.
-        listview = (ListView) findViewById(R.id.listview1);
-        listview.setAdapter(adapter);
 
-        listview.setOnItemClickListener(this);
 
         curpos = (TextView)findViewById(R.id.cur_pos);
 
@@ -98,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     temp.setCharAt(idx+1, (char)z);
                     htmlPageUrl = temp.toString();
 
-                    items.clear();
+                    oData.clear();
 
                         JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask();
                         jsoupAsyncTask.execute();
@@ -120,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     temp.setCharAt(idx+1, (char)z);
                     htmlPageUrl = temp.toString();
 
-                    items.clear();
+                    oData.clear();
 
                     JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask();
                     jsoupAsyncTask.execute();
@@ -160,7 +165,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 for(Element e: titles){
 
                     // 아이템 추가.
-                    items.add(e.text().trim());
+                    ItemData oItem = new ItemData();
+                    oItem.strTitle = e.text().trim();
+                    oItem.strData = e.text().trim();
+                    oData.add(oItem);
 
 
                     // 크롤링 페이지가 행사 공지일 때
@@ -219,7 +227,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         @Override
         protected void onPostExecute(Void result) {
             // listview 갱신
-            adapter.notifyDataSetChanged();
+            // 리스트뷰 어댑터 생성 및 연결
+            m_oListView = (ListView)findViewById(R.id.listview1);
+            oAdapter = new ListAdapter(oData);
+            m_oListView.setAdapter(oAdapter);
 
             setPreferences();
             SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
