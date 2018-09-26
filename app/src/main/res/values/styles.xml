@@ -9,4 +9,7 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="BlueAccent" parent="ThemeOverlay.AppCompat.Light">
+        <item name="colorAccent">#009dff</item>
+    </style>
 </resources>

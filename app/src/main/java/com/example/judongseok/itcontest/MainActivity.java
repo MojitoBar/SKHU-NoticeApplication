@@ -2,17 +2,23 @@ package com.example.judongseok.itcontest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.PorterDuff;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -46,15 +52,21 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
     private ListView m_oListView = null;
     public ArrayList<ItemData> oData;
     ListAdapter oAdapter;
+    // 공지 다음으로 넘어가는 버튼
+    Button nextButton;
+    // 공지 이전으로 넘어가는 버튼
+    Button preButton;
 
     TextView curpos;
+
+    ProgressBar progressBar;
+    boolean loadingCheck = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        Intent intent = getIntent();
+        
         htmlPageUrl = "http://www.skhu.ac.kr/board/boardlist.aspx?curpage=1&bsid=10008";
 
         CurlPath = new String[30];
@@ -69,17 +81,18 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
 
         curpos.setText(currentPage + " / 30");
 
-        // 공지 다음으로 넘어가는 버튼
-        Button nextButton = (Button)findViewById(R.id.button4);
+        final Button nextButton = (Button)findViewById(R.id.button4);
+        final Button preButton = (Button)findViewById(R.id.button5);
 
-        // 공지 이전으로 넘어가는 버튼
-        Button preButton = (Button)findViewById(R.id.button5);
+        progressBar = (ProgressBar)findViewById(R.id.progressBar2);
+
 
         // 다음으로 넘어가는 버튼 리스너
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (currentPage < 30 && htmlPageUrl != null){
+
+                if (currentPage < 30 && htmlPageUrl != null && loadingCheck == false){
                     currentPage++;
                     int idx = htmlPageUrl.indexOf("=");
                     int z = htmlPageUrl.charAt(idx+1);
@@ -90,17 +103,18 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
 
                     oData.clear();
 
-                        JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask();
-                        jsoupAsyncTask.execute();
+                    StartCrawling();
                     curpos.setText(currentPage + " / 30");
                 }
             }
         });
 
+        // 이전으로 넘어가는 버튼 리스너
         preButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (currentPage > 1 && htmlPageUrl != null){
+
+                if (currentPage > 1 && htmlPageUrl != null && loadingCheck == false){
                     currentPage--;
                     int idx = htmlPageUrl.indexOf("=");
                     int z = htmlPageUrl.charAt(idx+1);
@@ -112,17 +126,24 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
 
                     oData.clear();
 
-                    JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask();
-                    jsoupAsyncTask.execute();
+                    StartCrawling();
                     curpos.setText(currentPage + " / 30");
                 }
             }
         });
 
         // 맨 처음 실행되는 크롤링
+        StartCrawling();
+    }
+
+    void StartCrawling(){
+        progressBar.setVisibility(View.VISIBLE);
+        loadingCheck = true;
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask();
         jsoupAsyncTask.execute();
     }
+
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -234,6 +255,10 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
             setPreferences();
             SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
             SharedPreferences.Editor editor = pref.edit();
+            loadingCheck = false;
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+            System.out.println(loadingCheck);
+            progressBar.setVisibility(View.INVISIBLE);
         }
     }
 
