@@ -6,5 +6,7 @@ package com.example.judongseok.itcontest;
 
 public class ItemData {
     public String strTitle;
-    public String strData;
+    public String strDate;
+    public String strNum;
+    public String URL;
 }
