@@ -10,12 +10,14 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:orientation="vertical"
+        android:layout_marginStart="0dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginTop="0dp"
         android:background="#f2f2f2"
-        >
+        android:orientation="vertical">
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -25,19 +27,19 @@
                 android:id="@+id/imageView2"
                 android:layout_width="wrap_content"
                 android:layout_height="122dp"
-                app:srcCompat="@drawable/main_top_bar_back"
-                android:contentDescription="TODO" />
+                android:contentDescription="TODO"
+                app:srcCompat="@drawable/main_top_bar_back" />
 
             <HorizontalScrollView
                 android:id="@+id/scroll"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentBottom="true"
                 android:layout_gravity="center_horizontal|bottom"
-                android:scrollbars="none"
-                android:paddingBottom="10px">
+                android:paddingBottom="10px"
+                android:scrollbars="none">
 
                 <FrameLayout
                     android:layout_width="wrap_content"
@@ -65,7 +67,7 @@
                             android:layout_weight="1"
                             android:background="#ffffff"
                             android:text="수업공지"
-                            android:textSize="58px" />
+                            android:textSize="58px"/>
 
                         <Button
                             android:id="@+id/button8"
@@ -75,7 +77,7 @@
                             android:layout_weight="1"
                             android:background="#ffffff"
                             android:text="행사공지"
-                            android:textSize="58px" />
+                            android:textSize="58px"/>
 
                         <Button
                             android:id="@+id/button7"
@@ -85,7 +87,7 @@
                             android:layout_weight="1"
                             android:background="#ffffff"
                             android:text="장학공지"
-                            android:textSize="58px" />
+                            android:textSize="58px"/>
 
                         <Button
                             android:id="@+id/button6"
@@ -95,31 +97,52 @@
                             android:layout_weight="1"
                             android:background="#ffffff"
                             android:text="학사공지"
-                            android:textSize="58px" />
+                            android:textSize="58px"/>
 
                     </LinearLayout>
                 </FrameLayout>
 
 
             </HorizontalScrollView>
+
         </FrameLayout>
 
-        <ListView
-            android:id="@+id/listview1"
-            android:layout_width="match_parent"
-            android:layout_height="450dp"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:divider="@null"
-            android:scrollbars="none"
-            android:layout_marginBottom="10px"/>
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="460dp">
+
+            <ProgressBar
+                android:id="@+id/progressBar2"
+                style="@style/Widget.AppCompat.ProgressBar"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_centerHorizontal="true"
+                android:layout_marginLeft="120dp"
+                android:layout_marginTop="130dp"
+                android:translationZ="10dp"
+                android:visibility="visible"
+                android:theme="@style/BlueAccent"/>
+
+            <ListView
+                android:id="@+id/listview1"
+                android:layout_width="match_parent"
+                android:layout_height="480dp"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentLeft="true"
+                android:divider="@null"
+                android:paddingBottom="20dp"
+                android:scrollbars="none">
+
+            </ListView>
+        </FrameLayout>
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal"
+            android:background="@drawable/main_bot_bar_back"
             android:gravity="bottom"
-            android:background="@drawable/main_bot_bar_back">
+            android:orientation="horizontal"
+            android:visibility="visible">
 
             <Button
                 android:id="@+id/button5"
@@ -128,10 +151,10 @@
                 android:layout_alignParentStart="true"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentBottom="true"
-                android:layout_marginBottom="20dp"
                 android:layout_marginLeft="130dp"
+                android:layout_marginBottom="20dp"
                 android:layout_weight="1"
-                android:background="@drawable/mani_bot_bar_pagebutton_off"
+                android:background="@drawable/mani_bot_bar_pagebutton_on"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintHorizontal_bias="0.7"
                 app:layout_constraintLeft_toLeftOf="parent"
@@ -151,7 +174,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"/>
 
             <Button
                 android:id="@+id/button4"
@@ -160,9 +183,9 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentBottom="true"
-                android:layout_weight="1"
-                android:layout_marginBottom="20dp"
                 android:layout_marginRight="130dp"
+                android:layout_marginBottom="20dp"
+                android:layout_weight="1"
                 android:background="@drawable/mani_bot_bar_pagebutton_on2"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintHorizontal_bias="0.3"

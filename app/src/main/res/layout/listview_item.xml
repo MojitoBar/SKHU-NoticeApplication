@@ -34,14 +34,16 @@
 
             <TextView
                 android:id="@+id/textNum"
-                android:layout_width="match_parent"
+                android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="2.9"
                 android:gravity="center_vertical"
                 android:padding="15px"
                 android:text="제목"
                 android:textSize="45px"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:maxLines="1"
+                android:ellipsize="end"/>
         </LinearLayout>
 
         <TextView
@@ -55,6 +57,7 @@
             android:paddingLeft="10dp"
             android:text="날짜"
             android:textSize="40px"
-            android:maxLength="100"/>
+            android:maxLines="3"
+            android:ellipsize="end"/>
     </LinearLayout>
 </LinearLayout>

@@ -1,11 +1,17 @@
 package com.example.judongseok.itcontest;
 
+import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import com.tsengvn.typekit.TypekitContextWrapper;
 
 public class BaseActivity extends AppCompatActivity {
     @Override
@@ -22,5 +28,9 @@ public class BaseActivity extends AppCompatActivity {
             // 21 버전 이상일 때
             getWindow().setStatusBarColor(Color.BLACK);
         }
+    }
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        super.attachBaseContext(TypekitContextWrapper.wrap(newBase));
     }
 }
