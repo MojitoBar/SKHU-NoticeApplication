@@ -19,7 +19,7 @@ public class LoadingActivity extends Activity{
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                Intent intent = new Intent(getBaseContext(), NoticeButtons.class);
+                Intent intent = new Intent(getBaseContext(), MainActivity.class);
                 startActivity(intent);
                 finish();
             }

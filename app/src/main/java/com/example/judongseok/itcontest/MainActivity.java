@@ -25,16 +25,13 @@ import org.w3c.dom.Text;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 
-public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
-
-    private String htmlPageUrl = null;  //파싱할 홈페이지의 URL주소
-    private String[] CurlPath;
-    private String[] HurlPath;
-    private String[] JurlPath;
-    private String[] urlPath;
+public class MainActivity extends BaseActivity implements AdapterView.OnItemClickListener {
+    public String htmlPageUrl = null;  //파싱할 홈페이지의 URL주소
+    public String[] CurlPath;
+    public String[] HurlPath;
+    public String[] JurlPath;
+    public String[] urlPath;
 
     // 행사공지 카운터
     public int ContestNoticeCount = 0;
@@ -47,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     // 공지들이 리스트 뷰로 보여지게 하는 변수
     private ListView m_oListView = null;
-    ArrayList<ItemData> oData;
+    public ArrayList<ItemData> oData;
     ListAdapter oAdapter;
 
     TextView curpos;
@@ -58,8 +55,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         setContentView(R.layout.activity_main);
 
         Intent intent = getIntent();
-
-        htmlPageUrl = intent.getStringExtra("HtmlUrl");
+        htmlPageUrl = "http://www.skhu.ac.kr/board/boardlist.aspx?curpage=1&bsid=10008";
 
         CurlPath = new String[30];
         HurlPath = new String[30];
@@ -68,16 +64,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         urlPath = new String[30];
 
         oData = new ArrayList<>();
-//        // ArrayAdapter 생성. 아이템 View를 선택(single choice)가능하도록 만듦.
-//        adapter = new ArrayAdapter(this, R.layout.mytextview, items);
-//
-//        // listview 생성 및 adapter 지정.
-//        listview = (ListView) findViewById(R.id.listview1);
-//        listview.setAdapter(adapter);
-//
-//        listview.setOnItemClickListener(this);
-
-
 
         curpos = (TextView)findViewById(R.id.cur_pos);
 
@@ -97,7 +83,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     currentPage++;
                     int idx = htmlPageUrl.indexOf("=");
                     int z = htmlPageUrl.charAt(idx+1);
-                    System.out.print(z);
                     z++;
                     StringBuilder temp = new StringBuilder(htmlPageUrl);
                     temp.setCharAt(idx+1, (char)z);
@@ -141,9 +126,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        String c_list = urlPath[position];
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(c_list));
-        startActivity(intent);
+
     }
 
     private class JsoupAsyncTask extends AsyncTask<Void, Void, Void> {
@@ -158,42 +141,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             try {
 
                 Document doc = Jsoup.connect(htmlPageUrl).get();
-
-                //테스트1
-                Elements titles= doc.select("td.left15");
-
-                for(Element e: titles){
-
-                    // 아이템 추가.
-                    ItemData oItem = new ItemData();
-                    oItem.strTitle = e.text().trim();
-                    oItem.strData = e.text().trim();
-                    oData.add(oItem);
-
-
-                    // 크롤링 페이지가 행사 공지일 때
-                    if(htmlPageUrl.equals("http://www.skhu.ac.kr/board/boardlist.aspx?curpage=1&bsid=10008"))
-                        // 행사 공지 카운터 증가
-                        ContestNoticeCount++;
-                    // 크롤링 페이지가 학사 공지일 때
-                    else if(htmlPageUrl.equals("http://www.skhu.ac.kr/board/boardlist.aspx?curpage=1&bsid=10004&searchBun=51"))
-                        // 학사 공지 카운터 증가
-                        HacksaNoticeCount++;
-                    // 크롤링 페이지가 장학 공지일 때
-                    else if(htmlPageUrl.equals("http://www.skhu.ac.kr/board/boardlist.aspx?curpage=1&bsid=10006&searchBun=75"))
-                        // 장학 공지 카운터 증가
-                        JanghakcNoticeCount++;
-                }
-
                 //테스트2
-                titles= doc.select("td.left15 a");
+                Elements titles= doc.select("td.left15 a");
 
                 int i = 0;
-                System.out.println("-------------------------------------------------------------");
                 for(Element e: titles){
 
                     // 크롤링 페이지가 행사 공지일 때
-                    if(htmlPageUrl.equals("http://www.skhu.ac.kr/board/boardlist.aspx?curpage=1&bsid=10008")){
+                    if(htmlPageUrl.contains("10008")){
                         String href = e.attr("abs:href");
                         CurlPath[i] = href;
                         urlPath[i] = href;
@@ -201,21 +156,58 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                     }
 
-                        // 크롤링 페이지가 학사 공지일 때
-                    else if(htmlPageUrl.equals("http://www.skhu.ac.kr/board/boardlist.aspx?curpage=1&bsid=10004&searchBun=51")){
+                    // 크롤링 페이지가 학사 공지일 때
+                    else if(htmlPageUrl.contains("10004")){
                         String href = e.attr("abs:href");
                         HurlPath[i] = href;
                         urlPath[i] = href;
                         i++;
                     }
-                        // 크롤링 페이지가 장학 공지일 때
-                    else if(htmlPageUrl.equals("http://www.skhu.ac.kr/board/boardlist.aspx?curpage=1&bsid=10006&searchBun=75")){
+                    // 크롤링 페이지가 장학 공지일 때
+                    else if(htmlPageUrl.contains("10006")){
                         String href = e.attr("abs:href");
                         JurlPath[i] = href;
                         urlPath[i] = href;
                         i++;
                     }
 
+                }
+                //테스트1
+                titles= doc.select("td.left15");
+
+                int j = 0;
+                for(Element e: titles){
+                    ItemData oItem = new ItemData();
+                    oItem.strNum = e.text().trim();
+
+                    // 크롤링 페이지가 행사 공지일 때
+                    if(htmlPageUrl.contains("10008")){
+                        // 행사 공지 카운터 증가
+                        ContestNoticeCount++;
+                        oItem.strTitle = "행사공지";
+                    }
+                    // 크롤링 페이지가 학사 공지일 때
+                    else if(htmlPageUrl.contains("10004")){
+                        // 학사 공지 카운터 증가
+                        HacksaNoticeCount++;
+                        oItem.strTitle = "학사공지";
+                    }
+                    // 크롤링 페이지가 장학 공지일 때
+                    else if(htmlPageUrl.contains("10006")){
+                        // 장학 공지 카운터 증가
+                        JanghakcNoticeCount++;
+                        oItem.strTitle = "장학공지";
+                    }
+                    doc = Jsoup.connect(urlPath[j]).get();
+                    //테스트2
+                    titles = doc.select(".board_view_con");
+
+                    oItem.URL = urlPath[j];
+                    oItem.strDate = titles.text().trim() + "...";
+                    oData.add(oItem);
+
+                    titles = doc.select("td.left15");
+                    j++;
                 }
 
             } catch (IOException e) {
@@ -231,14 +223,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             m_oListView = (ListView)findViewById(R.id.listview1);
             oAdapter = new ListAdapter(oData);
             m_oListView.setAdapter(oAdapter);
-
+            m_oListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    String c_list = urlPath[position];
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(c_list));
+                    startActivity(intent);
+                }
+            });
             setPreferences();
             SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
             SharedPreferences.Editor editor = pref.edit();
-            System.out.println(pref.getString("LastJUrl", null));
-            System.out.println(pref.getString("LastHUrl", null));
-            System.out.println(pref.getString("LastCUrl", null));
-            //textviewHtmlDocument.setText(htmlContentInStringFormat);
         }
     }
 
