@@ -2,14 +2,6 @@ package com.example.judongseok.itcontest;
 
 import android.app.Service;
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.IBinder;
-import android.os.Message;
-import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,7 +17,7 @@ import java.util.ArrayList;
  */
 public class ListAdapter extends BaseAdapter {
     LayoutInflater inflater = null;
-    private ArrayList<ItemData> m_oData = null;
+    public ArrayList<ItemData> m_oData = null;
     private int nListCnt = 0;
     String url;
     int i;
