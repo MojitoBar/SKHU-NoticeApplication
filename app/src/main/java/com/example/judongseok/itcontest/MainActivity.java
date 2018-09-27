@@ -1,32 +1,22 @@
 package com.example.judongseok.itcontest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.graphics.ColorFilter;
-import android.graphics.PorterDuff;
-import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.HorizontalScrollView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -37,6 +27,9 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
     public String[] CurlPath;
     public String[] HurlPath;
     public String[] JurlPath;
+    public String[] SurlPath;
+    public String[] GurlPath;
+    public String[] NurlPath;
     public String[] urlPath;
 
     // 행사공지 카운터
@@ -45,6 +38,12 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
     public int HacksaNoticeCount= 0;
     // 장학공지 카운터
     public int JanghakcNoticeCount= 0;
+    // 일반공지 카운터
+    public int NomalNoticeCount = 0;
+    // 학점교류 카운터
+    public int ScoreNoticeCount = 0;
+    // 수업공지 카운터
+    public int SuepNoticeCount = 0;
 
     int currentPage = 1;
 
@@ -52,10 +51,6 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
     private ListView m_oListView = null;
     public ArrayList<ItemData> oData;
     ListAdapter oAdapter;
-    // 공지 다음으로 넘어가는 버튼
-    Button nextButton;
-    // 공지 이전으로 넘어가는 버튼
-    Button preButton;
 
     TextView curpos;
 
@@ -66,12 +61,24 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
+
         htmlPageUrl = "http://www.skhu.ac.kr/board/boardlist.aspx?curpage=1&bsid=10008";
 
+        final Button cbtn = (Button)findViewById(R.id.contestbtn);
+        final Button nbtn = (Button)findViewById(R.id.nomalbtn);
+        final Button gbtn = (Button)findViewById(R.id.scorebtn);
+        final Button sbtn = (Button)findViewById(R.id.suepbtn);
+        final Button jbtn = (Button)findViewById(R.id.janghackbtn);
+        final Button hbtn = (Button)findViewById(R.id.hacksabtn);
+
+        Button alarm = (Button)findViewById(R.id.alarm);
+
         CurlPath = new String[30];
+        SurlPath = new String[30];
         HurlPath = new String[30];
         JurlPath = new String[30];
+        GurlPath = new String[30];
+        NurlPath = new String[30];
 
         urlPath = new String[30];
 
@@ -86,13 +93,117 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
 
         progressBar = (ProgressBar)findViewById(R.id.progressBar2);
 
+        alarm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(MainActivity.this, MainScene.class);
+                startActivity(intent);
+            }
+        });
+
+        cbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                currentPage = 1;
+                curpos.setText(currentPage + " / 30");
+                htmlPageUrl = "http://www.skhu.ac.kr/board/boardlist.aspx?curpage=1&bsid=10008";
+                StartCrawling();
+                cbtn.setTextColor(Color.argb(255, 54, 172, 255));
+                nbtn.setTextColor(Color.argb(255, 71, 71, 71));
+                jbtn.setTextColor(Color.argb(255, 71, 71, 71));
+                hbtn.setTextColor(Color.argb(255, 71, 71, 71));
+                gbtn.setTextColor(Color.argb(255, 71, 71, 71));
+                sbtn.setTextColor(Color.argb(255, 71, 71, 71));
+            }
+        });
+
+        nbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                currentPage = 1;
+                curpos.setText(currentPage + " / 30");
+                htmlPageUrl = "http://www.skhu.ac.kr/board/boardlist.aspx?curpage=1&bsid=10007";
+                StartCrawling();
+                cbtn.setTextColor(Color.argb(255, 71, 71, 71));
+                nbtn.setTextColor(Color.argb(255, 54, 172, 255));
+                jbtn.setTextColor(Color.argb(255, 71, 71, 71));
+                hbtn.setTextColor(Color.argb(255, 71, 71, 71));
+                gbtn.setTextColor(Color.argb(255, 71, 71, 71));
+                sbtn.setTextColor(Color.argb(255, 71, 71, 71));
+            }
+        });
+
+        jbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                currentPage = 1;
+                curpos.setText(currentPage + " / 30");
+                htmlPageUrl = "http://www.skhu.ac.kr/board/boardlist.aspx?curpage=1&bsid=10006&searchBun=75";
+                StartCrawling();
+                cbtn.setTextColor(Color.argb(255, 71, 71, 71));
+                nbtn.setTextColor(Color.argb(255, 71, 71, 71));
+                jbtn.setTextColor(Color.argb(255, 54, 172, 255));
+                hbtn.setTextColor(Color.argb(255, 71, 71, 71));
+                gbtn.setTextColor(Color.argb(255, 71, 71, 71));
+                sbtn.setTextColor(Color.argb(255, 71, 71, 71));
+            }
+        });
+
+        hbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                currentPage = 1;
+                curpos.setText(currentPage + " / 30");
+                htmlPageUrl = "http://www.skhu.ac.kr/board/boardlist.aspx?curpage=1&bsid=10004&searchBun=51";
+                StartCrawling();
+                cbtn.setTextColor(Color.argb(255, 71, 71, 71));
+                nbtn.setTextColor(Color.argb(255, 71, 71, 71));
+                jbtn.setTextColor(Color.argb(255, 71, 71, 71));
+                hbtn.setTextColor(Color.argb(255, 54, 172, 255));
+                gbtn.setTextColor(Color.argb(255, 71, 71, 71));
+                sbtn.setTextColor(Color.argb(255, 71, 71, 71));
+            }
+        });
+
+        gbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                currentPage = 1;
+                curpos.setText(currentPage + " / 30");
+                htmlPageUrl = "http://www.skhu.ac.kr/board/boardlist.aspx?curpage=1&bsid=10038&searchBun=89";
+                StartCrawling();
+                cbtn.setTextColor(Color.argb(255, 71, 71, 71));
+                nbtn.setTextColor(Color.argb(255, 71, 71, 71));
+                jbtn.setTextColor(Color.argb(255, 71, 71, 71));
+                hbtn.setTextColor(Color.argb(255, 71, 71, 71));
+                gbtn.setTextColor(Color.argb(255, 54, 172, 255));
+                sbtn.setTextColor(Color.argb(255, 71, 71, 71));
+            }
+        });
+
+        sbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                currentPage = 1;
+                curpos.setText(currentPage + " / 30");
+                htmlPageUrl = "http://www.skhu.ac.kr/board/boardlist.aspx?curpage=1&bsid=10005&searchBun=53";
+                StartCrawling();
+                cbtn.setTextColor(Color.argb(255, 71, 71, 71));
+                nbtn.setTextColor(Color.argb(255, 71, 71, 71));
+                jbtn.setTextColor(Color.argb(255, 71, 71, 71));
+                hbtn.setTextColor(Color.argb(255, 71, 71, 71));
+                gbtn.setTextColor(Color.argb(255, 71, 71, 71));
+                sbtn.setTextColor(Color.argb(255, 54, 172, 255));
+            }
+        });
+
 
         // 다음으로 넘어가는 버튼 리스너
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                if (currentPage < 30 && htmlPageUrl != null && loadingCheck == false){
+                if (currentPage < 30 && htmlPageUrl != null && !loadingCheck){
                     currentPage++;
                     int idx = htmlPageUrl.indexOf("=");
                     int z = htmlPageUrl.charAt(idx+1);
@@ -114,7 +225,7 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
             @Override
             public void onClick(View v) {
 
-                if (currentPage > 1 && htmlPageUrl != null && loadingCheck == false){
+                if (currentPage > 1 && htmlPageUrl != null && !loadingCheck){
                     currentPage--;
                     int idx = htmlPageUrl.indexOf("=");
                     int z = htmlPageUrl.charAt(idx+1);
@@ -138,6 +249,7 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
 
     void StartCrawling(){
         progressBar.setVisibility(View.VISIBLE);
+        oData.clear();
         loadingCheck = true;
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         JsoupAsyncTask jsoupAsyncTask = new JsoupAsyncTask();
@@ -174,9 +286,7 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
                         CurlPath[i] = href;
                         urlPath[i] = href;
                         i++;
-
                     }
-
                     // 크롤링 페이지가 학사 공지일 때
                     else if(htmlPageUrl.contains("10004")){
                         String href = e.attr("abs:href");
@@ -191,7 +301,26 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
                         urlPath[i] = href;
                         i++;
                     }
-
+                    // 크롤링 페이지가 수업 공지일 때
+                    else if(htmlPageUrl.contains("10005")){
+                        String href = e.attr("abs:href");
+                        SurlPath[i] = href;
+                        urlPath[i] = href;
+                        i++;
+                    }
+                    // 크롤링 페이지가 학점 교류일 때
+                    else if(htmlPageUrl.contains("10038")){
+                        String href = e.attr("abs:href");
+                        GurlPath[i] = href;
+                        urlPath[i] = href;
+                        i++;
+                    }
+                    else if (htmlPageUrl.contains("10007")){
+                        String href = e.attr("abs:href");
+                        NurlPath[i] = href;
+                        urlPath[i] = href;
+                        i++;
+                    }
                 }
                 //테스트1
                 titles= doc.select("td.left15");
@@ -219,6 +348,23 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
                         JanghakcNoticeCount++;
                         oItem.strTitle = "장학공지";
                     }
+                    // 크롤링 페이지가 수업 공지일 때
+                    else if(htmlPageUrl.contains("10005")){
+                        SuepNoticeCount++;
+                        oItem.strTitle = "수업공지";
+                    }
+                    // 크롤링 페이지가 학점 교류일 때
+                    else if(htmlPageUrl.contains("10038")){
+                        ScoreNoticeCount++;
+                        oItem.strTitle = "학점교류";
+                    }
+                    else if (htmlPageUrl.contains("10007")){
+                        NomalNoticeCount++;
+                        oItem.strTitle = "일반공지";
+                    }
+
+
+                    // 공지 content 불러오기
                     doc = Jsoup.connect(urlPath[j]).get();
                     //테스트2
                     titles = doc.select(".board_view_con");
@@ -241,6 +387,7 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
         protected void onPostExecute(Void result) {
             // listview 갱신
             // 리스트뷰 어댑터 생성 및 연결
+
             m_oListView = (ListView)findViewById(R.id.listview1);
             oAdapter = new ListAdapter(oData);
             m_oListView.setAdapter(oAdapter);
@@ -274,6 +421,12 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
                 editor.putString("LastCUrl", CurlPath[14]);
             if (HurlPath[20] != null)
                 editor.putString("LastHUrl", HurlPath[20]);
+            if (SurlPath[14] != null)
+                editor.putString("LastSUrl", SurlPath[14]);
+            if (GurlPath[15] != null)
+                editor.putString("LastGUrl", GurlPath[15]);
+            if (NurlPath[17] != null)
+                editor.putString("LastNUrl", NurlPath[17]);
         }
 
         editor.commit();

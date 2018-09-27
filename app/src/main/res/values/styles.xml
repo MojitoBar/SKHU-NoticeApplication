@@ -12,4 +12,7 @@
     <style name="BlueAccent" parent="ThemeOverlay.AppCompat.Light">
         <item name="colorAccent">#009dff</item>
     </style>
+    <style name="status" parent="ThemeOverlay.AppCompat.Light">
+        <item name="colorAccent">#f2f2f2</item>
+    </style>
 </resources>

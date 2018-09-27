@@ -13,16 +13,8 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
-import android.os.IBinder;
-import android.widget.Toast;
 
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.text.method.ScrollingMovementMethod;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -34,9 +26,6 @@ import java.net.URL;
 
 
 public class MyService extends Service {
-    private String htmlPageUrl = "http://www.skhu.ac.kr/board/boardlist.aspx?curpage=1&bsid=10006&searchBun=75"; //파싱할 홈페이지의 URL주소
-
-
     NotificationManager Notifi_M;
     ServiceThread thread;
     Notification Notifi ;
@@ -44,41 +33,44 @@ public class MyService extends Service {
     String[] JurlPath = new String[30];
     String[] HurlPath = new String[30];
     String[] CurlPath = new String[30];
+    String[] NurlPath = new String[30];
+    String[] GurlPath = new String[30];
+    String[] SurlPath = new String[30];
+
     String LastJUrl = "";
     String LastHUrl = "";
     String LastCUrl = "";
+    String LastNUrl = "";
+    String LastGUrl = "";
+    String LastSUrl = "";
 
     String NewJUrl = "";
     String NewHUrl = "";
     String NewCUrl = "";
+    String NewNUrl = "";
+    String NewGUrl = "";
+    String NewSUrl = "";
 
     boolean j = false;
     boolean h = false;
     boolean c = false;
+    boolean n = false;
+    boolean g = false;
+    boolean s = false;
 
-    // 크롤링 카운터
-    int cnt = 0;
-    int num = 0;
+
 
     private class JsoupAsyncTask extends AsyncTask<Void, Void, Void> {
-
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
         }
-
         @Override
         protected Void doInBackground(Void... params) {
             try {
-
                 // 행사공지 크롤링
                 Document doc = Jsoup.connect("http://www.skhu.ac.kr/board/boardlist.aspx?curpage=1&bsid=10008").get();
-                //테스트1
-                Elements titles= doc.select("td.left15");
-
-                for(Element e: titles){
-                    cnt++;
-                }
+                Elements titles;
                 int i = 0;
 
                 titles= doc.select("td.left15 a");
@@ -90,12 +82,6 @@ public class MyService extends Service {
 
                 // 학사공지 크롤링
                 doc = Jsoup.connect("http://www.skhu.ac.kr/board/boardlist.aspx?curpage=1&bsid=10004&searchBun=51").get();
-                //테스트1
-                titles= doc.select("td.left15");
-
-                for(Element e: titles){
-                    cnt++;
-                }
                 i = 0;
 
                 titles= doc.select("td.left15 a");
@@ -105,21 +91,47 @@ public class MyService extends Service {
                     i++;
                 }
 
-
                 // 장학공지 크롤링
                 doc = Jsoup.connect("http://www.skhu.ac.kr/board/boardlist.aspx?curpage=1&bsid=10006&searchBun=75").get();
-                //테스트1
-                titles= doc.select("td.left15");
-
-                for(Element e: titles){
-                    cnt++;
-                }
                 i = 0;
 
                 titles= doc.select("td.left15 a");
                 for(Element e: titles){
                     String href = e.attr("abs:href");
                     JurlPath[i] = href;
+                    i++;
+                }
+
+                // 일반공지 크롤링
+                doc = Jsoup.connect("http://www.skhu.ac.kr/board/boardlist.aspx?curpage=1&bsid=10007").get();
+                i = 0;
+
+                titles= doc.select("td.left15 a");
+                for(Element e: titles){
+                    String href = e.attr("abs:href");
+                    NurlPath[i] = href;
+                    i++;
+                }
+
+                // 학점교류 크롤링
+                doc = Jsoup.connect("http://www.skhu.ac.kr/board/boardlist.aspx?curpage=1&bsid=10038&searchBun=89").get();
+                i = 0;
+
+                titles= doc.select("td.left15 a");
+                for(Element e: titles){
+                    String href = e.attr("abs:href");
+                    GurlPath[i] = href;
+                    i++;
+                }
+
+                // 수업공지 크롤링
+                doc = Jsoup.connect("http://www.skhu.ac.kr/board/boardlist.aspx?curpage=1&bsid=10005&searchBun=53").get();
+                i = 0;
+
+                titles= doc.select("td.left15 a");
+                for(Element e: titles){
+                    String href = e.attr("abs:href");
+                    SurlPath[i] = href;
                     i++;
                 }
             } catch (IOException e) {
@@ -141,13 +153,10 @@ public class MyService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
-
         SharedPreferences pref = getSharedPreferences("pref", MODE_PRIVATE);
         LastJUrl = pref.getString("LastJUrl", "");
         LastCUrl = pref.getString("LastCUrl", "");
         LastHUrl = pref.getString("LastHUrl", "");
-
 
         Notifi_M = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         myServiceHandler handler = new myServiceHandler();
@@ -171,7 +180,9 @@ public class MyService extends Service {
         NewJUrl = JurlPath[23];
         NewCUrl = CurlPath[14];
         NewHUrl = HurlPath[20];
-
+        NewNUrl = NurlPath[17];
+        NewGUrl = GurlPath[15];
+        NewSUrl = SurlPath[14];
 
         if (NewJUrl != null && !LastJUrl.equals(NewJUrl)){
             j = true;
@@ -182,9 +193,15 @@ public class MyService extends Service {
         if (NewHUrl != null && !LastHUrl.equals(NewHUrl)){
             h = true;
         }
-
-
-        cnt = 0;
+        if (NewNUrl != null && !LastNUrl.equals(NewNUrl)){
+            n = true;
+        }
+        if (NewGUrl != null && !LastGUrl.equals(NewGUrl)){
+            g = true;
+        }
+        if (NewSUrl != null && !LastSUrl.equals(NewSUrl)){
+            s = true;
+        }
     }
 
     class myServiceHandler extends Handler {
@@ -205,7 +222,7 @@ public class MyService extends Service {
                 Notifi = new Notification.Builder(getApplicationContext())
                         .setContentTitle("장학 공지 알림!")
                         .setContentText("장학 공지가 업데이트 됐습니다.")
-                        .setSmallIcon(R.drawable.icon_new_gry)
+                        .setSmallIcon(R.drawable.snews_icon)
                         .setTicker("알림!!!")
                         .setContentIntent(pendingIntent)
                         .build();
@@ -224,7 +241,26 @@ public class MyService extends Service {
                 Notifi = new Notification.Builder(getApplicationContext())
                         .setContentTitle("행사 공지 알림!")
                         .setContentText("행사 공지가 업데이트 됐습니다.")
-                        .setSmallIcon(R.drawable.icon_new_gry)
+                        .setSmallIcon(R.drawable.snews_icon)
+                        .setTicker("알림!!!")
+                        .setContentIntent(pendingIntent)
+                        .build();
+                //소리추가
+                Notifi.defaults = Notification.DEFAULT_SOUND;
+
+                //알림 소리를 한번만 내도록
+                Notifi.flags = Notification.FLAG_ONLY_ALERT_ONCE;
+
+                //확인하면 자동으로 알림이 제거 되도록
+                Notifi.flags = Notification.FLAG_AUTO_CANCEL;
+                Notifi_M.notify( 777 , Notifi);
+            }
+            if (s){
+                s = false;
+                Notifi = new Notification.Builder(getApplicationContext())
+                        .setContentTitle("수업 공지 알림!")
+                        .setContentText("수업 공지가 업데이트 됐습니다.")
+                        .setSmallIcon(R.drawable.snews_icon)
                         .setTicker("알림!!!")
                         .setContentIntent(pendingIntent)
                         .build();
@@ -243,7 +279,63 @@ public class MyService extends Service {
                 Notifi = new Notification.Builder(getApplicationContext())
                         .setContentTitle("학사 공지 알림!")
                         .setContentText("학사 공지가 업데이트 됐습니다.")
-                        .setSmallIcon(R.drawable.icon_new_gry)
+                        .setSmallIcon(R.drawable.snews_icon)
+                        .setTicker("알림!!!")
+                        .setContentIntent(pendingIntent)
+                        .build();
+                //소리추가
+                Notifi.defaults = Notification.DEFAULT_SOUND;
+
+                //알림 소리를 한번만 내도록
+                Notifi.flags = Notification.FLAG_ONLY_ALERT_ONCE;
+
+                //확인하면 자동으로 알림이 제거 되도록
+                Notifi.flags = Notification.FLAG_AUTO_CANCEL;
+                Notifi_M.notify( 777 , Notifi);
+            }
+            if (n){
+                n = false;
+                Notifi = new Notification.Builder(getApplicationContext())
+                        .setContentTitle("일반 공지 알림!")
+                        .setContentText("일반 공지가 업데이트 됐습니다.")
+                        .setSmallIcon(R.drawable.snews_icon)
+                        .setTicker("알림!!!")
+                        .setContentIntent(pendingIntent)
+                        .build();
+                //소리추가
+                Notifi.defaults = Notification.DEFAULT_SOUND;
+
+                //알림 소리를 한번만 내도록
+                Notifi.flags = Notification.FLAG_ONLY_ALERT_ONCE;
+
+                //확인하면 자동으로 알림이 제거 되도록
+                Notifi.flags = Notification.FLAG_AUTO_CANCEL;
+                Notifi_M.notify( 777 , Notifi);
+            }
+            if (g){
+                h = false;
+                Notifi = new Notification.Builder(getApplicationContext())
+                        .setContentTitle("학점 교류 알림!")
+                        .setContentText("학점 교류가 업데이트 됐습니다.")
+                        .setSmallIcon(R.drawable.snews_icon)
+                        .setTicker("알림!!!")
+                        .setContentIntent(pendingIntent)
+                        .build();
+                //소리추가
+                Notifi.defaults = Notification.DEFAULT_SOUND;
+
+                //알림 소리를 한번만 내도록
+                Notifi.flags = Notification.FLAG_ONLY_ALERT_ONCE;
+
+                //확인하면 자동으로 알림이 제거 되도록
+                Notifi.flags = Notification.FLAG_AUTO_CANCEL;
+                Notifi_M.notify( 777 , Notifi);
+            }
+            else {
+                Notifi = new Notification.Builder(getApplicationContext())
+                        .setContentTitle("테스트 알림!")
+                        .setContentText("이런 형식으로 알림이 표시 됩니다!")
+                        .setSmallIcon(R.drawable.snews_icon)
                         .setTicker("알림!!!")
                         .setContentIntent(pendingIntent)
                         .build();

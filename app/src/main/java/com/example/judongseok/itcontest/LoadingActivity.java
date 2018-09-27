@@ -9,7 +9,7 @@ import android.os.Handler;
  * Created by judongseok on 2018-09-16.
  */
 
-public class LoadingActivity extends Activity{
+public class LoadingActivity extends BaseActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
