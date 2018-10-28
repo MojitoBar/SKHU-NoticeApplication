@@ -335,7 +335,7 @@ public class MyService extends Service {
                 Notifi = new Notification.Builder(getApplicationContext())
                         .setContentTitle("테스트 알림!")
                         .setContentText("이런 형식으로 알림이 표시 됩니다!")
-                        .setSmallIcon(R.drawable.snews_icon)
+                        .setSmallIcon(R.drawable.black_icon)
                         .setTicker("알림!!!")
                         .setContentIntent(pendingIntent)
                         .build();
